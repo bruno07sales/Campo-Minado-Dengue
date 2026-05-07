@@ -28,8 +28,9 @@ export function draw({ boardWidth, boardHeight }) {
 
             $hex.append($hexTop, $hexMiddle, $hexBottom);
             $hexRow.append($hex);
-            $("#board").append($hexRow);
         }
+
+        $("#board").append($hexRow); // ✅ fora do loop de y
     }
 }
 
@@ -84,10 +85,10 @@ function _insertBombs(boardWidth, boardHeight, bombs) {
         const x = Math.floor(Math.random() * boardHeight);
         const y = Math.floor(Math.random() * boardWidth);
 
-        if (boardMatrix[x][y] == null || boardMatrix[x][y].value == "💣")  i--;
+        if (boardMatrix[x][y] == null || boardMatrix[x][y].value == "🦟")  i--;
         else {
             mosquitoArray.push({ x, y });
-            boardMatrix[x][y].value = "💣";
+            boardMatrix[x][y].value = "🦟";
         }
     }
 }
@@ -95,7 +96,7 @@ function _insertBombs(boardWidth, boardHeight, bombs) {
 function _updateNumbers(boardWidth, boardHeight) {
     for (let x = 0; x < boardHeight; x++) {
         for (let y = 0; y < boardWidth; y++) {
-            if (boardMatrix[x][y]?.value == "💣") {
+            if (boardMatrix[x][y]?.value == "🦟") {
                 const modifier = x % 2 != 0 ? -1 : 0
                 _setNumber(x, y - 1);
                 _setNumber(x, y + 1);
@@ -112,7 +113,7 @@ function _setNumber(x, y) {
     if (
         x >= boardMatrix.length || y >= boardMatrix[0].length ||
         x < 0 || y < 0 ||
-        boardMatrix[x][y] == null || boardMatrix[x][y].value == "💣"
+        boardMatrix[x][y] == null || boardMatrix[x][y].value == "🦟"
     ) return;
     boardMatrix[x][y].value += 1;
 }
@@ -149,7 +150,7 @@ function _handleSelection($hexTile) {
 
     const { x, y } = _getHexTileCoord($hexTile.attr("id"));
     boardMatrix[x][y].isSelected = true;
-    const isBomb = boardMatrix[x][y].value == '💣';
+    const isBomb = boardMatrix[x][y].value == '🦟';
 
     if(!!boardMatrix[x][y].value) {
         $hexTile.find(".middle").text(boardMatrix[x][y].value);
@@ -169,10 +170,11 @@ function _handleSelection($hexTile) {
 
 function _getHexTileCoord(id) {
     const coordArray = id.split("-");
-    const x = Number(coordArray[0]); // está vindo como string, preciso converter para número para acessar a matriz corretamente
-    const y = Number(coordArray[1]); // está vindo como string, preciso converter para número para acessar a matriz corretamente
+    const x = Number(coordArray[0]); // ✅ convertido para número
+    const y = Number(coordArray[1]); // ✅ convertido para número
     return { x, y }
 }
+
 function _revealBombs() {
     mosquitoArray.forEach(({ x, y }) => {
         const $hexTile = $(`#${x}-${y}`);
