@@ -2,20 +2,27 @@ export let isRunning = false;
 let timer;
 
 export function start() {
+    if (isRunning) return;
+
     isRunning = true;
     let secs = 0;
+
     timer = setInterval(() => {
         secs += 1;
-        $("#timer").text(`${secs} (s)`);
-    }, 1000)
-
+        $('#timer').text(`${secs} (s)`);
+    }, 1000);
 }
 
 export function stop() {
+    if (timer) {
+        clearInterval(timer);
+        timer = null;
+    }
+
     isRunning = false;
-    clearInterval(timer);
 }
 
 export function clear() {
-    $("#timer").text("0 (s)");
+    stop();
+    $('#timer').text('0 (s)');
 }
