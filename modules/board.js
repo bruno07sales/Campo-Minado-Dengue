@@ -5,8 +5,8 @@ import * as graph from './graph.js';
 export let boardMatrix = [];
 let mosquitoesArray = [];
 
-const LEFT_CLICK = 1;
-const RIGHT_CLICK = 3;
+const LEFT_CLICK = 0;
+const RIGHT_CLICK = 2;
 
 export function draw({ boardWidth, boardHeight }) {
     const container = document.getElementById("board");
@@ -75,15 +75,16 @@ export function selectTileByCord({x, y}) {
 
 function _mouseClickEvent(event) {
     if(game.isGameOver) return;
+    if(isProcessingClick) return;
     if(timer.isRunning === false) timer.start();
     if (event.button === 2) event.preventDefault();
 
     const $hexTile = $(event.currentTarget);
     switch (event.button) {
-        case 0: // Left click
+        case LEFT_CLICK: // Left click
             _handleSelection($hexTile);
             break;
-        case 2: // Right click
+        case RIGHT_CLICK: // Right click
             _toggleFlag($hexTile);
             break;
     }
@@ -161,8 +162,10 @@ function _handleSelection($hexTile) {
     if (hasFlag) return;
 
     const { x, y } = _getHexTileCoord($hexTile.attr("id"));
-    boardMatrix[x][y].isSelected = true;
     const isMosquito = boardMatrix[x][y].value == '🦟';
+
+    isProcessingClick = true;
+    boardMatrix[x][y].isSelected = true;
 
     if(!!boardMatrix[x][y].value) {
         $hexTile.find(".middle").text(boardMatrix[x][y].value);
@@ -171,6 +174,7 @@ function _handleSelection($hexTile) {
     }
 
     if (isMosquito) {
+        $hexTile.children().removeClass("selected");
         $hexTile.children().addClass("mosquito");
         _revealMosquitos();
         game.end("Voce perdeu!");
@@ -178,12 +182,13 @@ function _handleSelection($hexTile) {
         $hexTile.children().addClass("selected");
         game.checkWin();
     }
+    isProcessingClick = false;
 }
 
 function _getHexTileCoord(id) {
     const coordArray = id.split("-");
-    const x = coordArray[0];
-    const y = coordArray[1];
+    const x = Number(coordArray[0]);
+    const y = Number(coordArray[1]);
     return { x, y }
 }
 
