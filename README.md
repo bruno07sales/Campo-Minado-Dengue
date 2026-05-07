@@ -6,10 +6,7 @@
 ## Sobre
 O projeto consiste em uma variação do jogo campo minado no qual o tabuleiro é formado por hexágonos.
 
-## Screenshots
-![screenshot01](/screenshots/screenshot01.png)
-![screenshot02](/screenshots/screenshot02.png)
-![screenshot03](/screenshots/screenshot03.png)
+
 
 ## Instalação
 **Linguagem**: Javascript<br>
