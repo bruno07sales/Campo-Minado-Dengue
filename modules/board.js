@@ -4,6 +4,7 @@ import * as graph from './graph.js';
 
 export let boardMatrix = [];
 let mosquitoesArray = [];
+let isProcessingClick = false;
 
 const LEFT_CLICK = 1;
 const RIGHT_CLICK = 3;
@@ -75,6 +76,7 @@ export function selectTileByCord({x, y}) {
 
 function _mouseClickEvent(event) {
     if(game.isGameOver) return;
+    if(isProcessingClick) return;
     if(timer.isRunning === false) timer.start();
     if (event.button === 2) event.preventDefault();
 
@@ -161,8 +163,11 @@ function _handleSelection($hexTile) {
     if (hasFlag) return;
 
     const { x, y } = _getHexTileCoord($hexTile.attr("id"));
-    boardMatrix[x][y].isSelected = true;
     const isMosquito = boardMatrix[x][y].value == '🦟';
+
+    isProcessingClick = true;
+    boardMatrix[x][y].isSelected = true;
+    $hexTile.children().addClass("selected");
 
     if(!!boardMatrix[x][y].value) {
         $hexTile.find(".middle").text(boardMatrix[x][y].value);
@@ -171,13 +176,14 @@ function _handleSelection($hexTile) {
     }
 
     if (isMosquito) {
+        $hexTile.children().removeClass("selected");
         $hexTile.children().addClass("mosquito");
         _revealMosquitos();
         game.end("Voce perdeu!");
     } else {
-        $hexTile.children().addClass("selected");
         game.checkWin();
     }
+    isProcessingClick = false;
 }
 
 function _getHexTileCoord(id) {
