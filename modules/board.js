@@ -4,9 +4,10 @@ import * as graph from './graph.js';
 
 export let boardMatrix = [];
 let mosquitoArray = [];
+let isProcessingClick = false;
 
-const RIGHT_CLICK = 1;
-const LEFT_CLICK = 3;
+const LEFT_CLICK = 1;
+const RIGHT_CLICK = 3;
 
 export function draw({ boardWidth, boardHeight }) {
     const container = document.getElementById("board");
@@ -66,14 +67,16 @@ export function selectTileByCord({x, y}) {
 
 function _mouseClickEvent(event) {
     if(game.isGameOver) return;
+    if(isProcessingClick) return;
     if(timer.isRunning === false) timer.start();
+    if(event.button === 2) event.preventDefault();
 
     const $hexTile = $(event.currentTarget);
-    switch (event.which) {
-        case RIGHT_CLICK:
+    switch (event.button) {
+        case LEFT_CLICK:
             _handleSelection($hexTile);
             break;
-        case LEFT_CLICK:
+        case RIGHT_CLICK:
             _toggleFlag($hexTile);
             break;
     }
@@ -149,8 +152,11 @@ function _handleSelection($hexTile) {
     if (hasFlag) return;
 
     const { x, y } = _getHexTileCoord($hexTile.attr("id"));
-    boardMatrix[x][y].isSelected = true;
     const isBomb = boardMatrix[x][y].value == '🦟';
+
+    isProcessingClick = true;
+    boardMatrix[x][y].isSelected = true;
+    $hexTile.children().addClass("selected");
 
     if(!!boardMatrix[x][y].value) {
         $hexTile.find(".middle").text(boardMatrix[x][y].value);
@@ -159,20 +165,35 @@ function _handleSelection($hexTile) {
     }
 
     if (isBomb) {
+        $hexTile.children().removeClass("selected");
         $hexTile.children().addClass("bomb");
         _revealBombs();
         game.end("Voce perdeu!");
     } else {
-        $hexTile.children().addClass("selected");
         game.checkWin();
     }
+    isProcessingClick = false;
 }
 
 function _getHexTileCoord(id) {
     const coordArray = id.split("-");
-    const x = Number(coordArray[0]); // ✅ convertido para número
-    const y = Number(coordArray[1]); // ✅ convertido para número
-    return { x, y }
+    
+    // Validar se o ID tem o formato correto
+    if(coordArray.length !== 2) {
+        console.error(`ID inválido: ${id}`);
+        return { x: -1, y: -1 };
+    }
+    
+    const x = Number(coordArray[0]);
+    const y = Number(coordArray[1]);
+    
+    // Validar se as coordenadas são números válidos
+    if(isNaN(x) || isNaN(y)) {
+        console.error(`Coordenadas inválidas: x=${x}, y=${y}`);
+        return { x: -1, y: -1 };
+    }
+    
+    return { x, y };
 }
 
 function _revealBombs() {

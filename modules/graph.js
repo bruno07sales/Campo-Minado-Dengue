@@ -8,6 +8,8 @@ export function bfs(matrix, {x, y}) {
 
     x = parseInt(x);
     y = parseInt(y);
+    
+    // Garantir que célula inicial é adicionada à fila
     enqueue({x, y});
 
     function enqueue(item) {
@@ -44,23 +46,42 @@ export function bfs(matrix, {x, y}) {
         return neighbors;
     }
 
-    for(let i = queueHead; i < queueTail; i++) {
-        getNodesNotSelected(dequeue()).forEach((node) => {
+    while(queueHead < queueTail) {
+        const current = dequeue();
+        const neighbors = getNodesNotSelected(current);
+        
+        neighbors.forEach((node) => {
             selectNode(node);
-            if(matrix[node.x][node.y]?.value === 0) enqueue(node);
+            if(matrix[node.x][node.y]?.value === 0) {
+                enqueue(node);
+            }
         });
     }
 
 }
 
 export function dfs(matrix, {x, y}) {
+    // Limpar propriedade 'seen' de chamadas anteriores
+    for(let i = 0; i < matrix.length; i++) {
+        for(let j = 0; j < matrix[i].length; j++) {
+            if(matrix[i][j]) {
+                delete matrix[i][j].seen;
+            }
+        }
+    }
+    
     x = parseInt(x);
     y = parseInt(y);
+    _dfsHelper(matrix, {x, y});
+}
 
+function _dfsHelper(matrix, {x, y}) {
     if (
         x < 0 || x >= matrix.length ||
         y < 0 || y >= matrix[0].length ||
-        matrix[x][y] == null || matrix[x][y].seen
+        matrix[x][y] == null || 
+        matrix[x][y].isSelected === true ||
+        matrix[x][y].seen === true
     ) return;
 
     matrix[x][y].seen = true;
@@ -69,10 +90,10 @@ export function dfs(matrix, {x, y}) {
     if (matrix[x][y].value > 0) return;
 
     const modifier = x % 2 != 0 ? -1 : 0
-    dfs(matrix, {x, y: y - 1});
-    dfs(matrix, {x, y: y + 1});
-    dfs(matrix, {x: x - 1, y: y + modifier});
-    dfs(matrix, {x: x - 1, y: y + 1 + modifier});
-    dfs(matrix, {x: x + 1, y: y + modifier});
-    dfs(matrix, {x: x + 1, y: y + 1 + modifier});
+    _dfsHelper(matrix, {x, y: y - 1});
+    _dfsHelper(matrix, {x, y: y + 1});
+    _dfsHelper(matrix, {x: x - 1, y: y + modifier});
+    _dfsHelper(matrix, {x: x - 1, y: y + 1 + modifier});
+    _dfsHelper(matrix, {x: x + 1, y: y + modifier});
+    _dfsHelper(matrix, {x: x + 1, y: y + 1 + modifier});
 }
