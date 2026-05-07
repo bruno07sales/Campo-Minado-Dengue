@@ -1,0 +1,190 @@
+@font-face {
+    font-family: pixelFont;
+    src: url(assets/PixelGameFont.ttf);
+}
+
+body {
+    --hex-width: 45px;
+    --hex-height: 26px; 
+    --hex-half-width: calc(var(--hex-width)/2);
+    --hex-half-height: calc(var(--hex-height)/2);
+    --hex-font-size: 1.35rem;
+
+    --color-primary: rgb(34, 87, 210);
+    --color-selected: #fcae11;
+    --color-selected-mosquito: #D0342C;
+    --color-flagged: #444444;
+
+    user-select: none;
+    margin: 0px;
+    color: white;
+    font-size: 22px;
+    font-family: 'pixelFont';
+    background-color: #24233f;
+}
+
+#container {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.menu {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-right: 2rem;
+}
+
+.title {
+    font-size: 3rem;
+}
+
+.difficulty, .algorithm {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.subtitle {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.options {
+    display: flex;
+}
+
+.option {
+    font-size: 1.3rem;
+    font-weight: 100;
+    margin: 0 1rem;
+    cursor: pointer;
+    border-left: 1px solid white;
+    border-right: 1px solid white;
+    border-top: 1px solid transparent;
+    border-bottom: 1px solid transparent;
+    padding: 0.2rem 0.8rem;
+    font-family:'Courier New', Courier, monospace;
+    transition: 0.3s all ease;
+}
+
+.option:hover {
+    border: 1px solid var(--color-primary);
+    color: var(--color-primary);
+}
+
+.option-active {
+    border: 1px solid var(--color-primary);
+    color: var(--color-primary);
+    cursor: default;
+}
+
+.info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 2rem 0;
+}
+
+.info div {
+    margin: 0 1rem
+}
+
+#restart {
+    background-color: var(--color-primary);
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 1.3rem;
+    font-weight: 100;
+    cursor: pointer;
+    border: 1px solid var(--color-primary);
+    padding: 0.2rem 1rem;
+    transition: 0.3s all ease;
+}
+
+#restart:hover {
+    background-color: transparent;
+    color: var(--color-primary);
+}
+
+#board {
+    border-left: 1px solid rgba(255, 255, 255, 0.121);
+    padding-left: 3rem;
+}
+
+.hex {
+    cursor: pointer;
+    float: left;
+    margin-left: 3px;
+    margin-bottom: calc(var(--hex-half-height) * -1 + 3px);
+}
+
+.hex .middle {
+    font-size: var(--hex-font-size);
+    font-weight: 600;
+    text-align: center;
+    width: var(--hex-width);
+    height: var(--hex-height);
+    background-color: var(--color-primary);
+}
+
+.hex .middle.flagged {
+    background-color: var(--color-flagged);
+}
+
+.hex .middle.selected {
+    background-color: var(--color-selected);
+}
+
+.hex .middle.mosquito {
+    background-color: var(--color-selected-mosquito);
+}
+
+.hex .bottom, .hex .top {
+    width: 0;
+    border-left: var(--hex-half-width) solid transparent;
+    border-right: var(--hex-half-width) solid transparent;
+}
+
+.hex .top {
+    border-bottom: var(--hex-half-height) solid var(--color-primary);
+}
+
+.hex .top.flagged {
+    border-bottom-color: var(--color-flagged);
+}
+
+.hex .top.selected {
+    border-bottom-color: var(--color-selected);
+}
+
+.hex .top.mosquito {
+    border-bottom-color: var(--color-selected-mosquito);
+}
+
+.hex .bottom {
+    border-top: var(--hex-half-height) solid var(--color-primary);
+}
+
+.hex .bottom.flagged {
+    border-top-color: var(--color-flagged);
+}
+
+.hex .bottom.selected {
+    border-top-color: var(--color-selected);
+}
+
+.hex .bottom.mosquito {
+    border-top-color: var(--color-selected-mosquito);
+}
+
+.hex-row {
+    clear: left;
+}
+
+.hex-row.even {
+    margin-left: calc(var(--hex-half-width) + 1px);
+}
