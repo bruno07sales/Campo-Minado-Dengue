@@ -26,3 +26,4 @@ export function clear() {
     stop();
     $('#timer').text('0 (s)');
 }
+

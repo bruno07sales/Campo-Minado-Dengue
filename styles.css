@@ -188,3 +188,4 @@ body {
 .hex-row.even {
     margin-left: calc(var(--hex-half-width) + 1px);
 }
+

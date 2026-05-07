@@ -66,3 +66,4 @@ function _loadDifficulty() {
 
     return difficulty;
 }
+

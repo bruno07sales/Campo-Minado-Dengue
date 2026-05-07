@@ -47,3 +47,4 @@ function listenAlgorithm() {
         window.localStorage.setItem('algorithm', $(event.target)[0].id);
     });
 }
+
