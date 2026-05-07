@@ -3,46 +3,37 @@ import * as timer from './timer.js';
 import * as graph from './graph.js';
 
 export let boardMatrix = [];
-let mosquitoesArray = [];
-let isProcessingClick = false;
+let mosquitoArray = [];
 
-const LEFT_CLICK = 1;
-const RIGHT_CLICK = 3;
+const RIGHT_CLICK = 1;
+const LEFT_CLICK = 3;
 
 export function draw({ boardWidth, boardHeight }) {
     const container = document.getElementById("board");
-    if (!container) return;
-    container.innerHTML = '';
+    container.replaceChildren();
 
     for(let x = 0; x < boardHeight; x++) {
-        const hexRow = document.createElement("div");
-        hexRow.className = "hex-row";
-        if(x % 2 == 0) hexRow.classList.add("even");
+        const $hexRow = $("<div></div>").addClass("hex-row")
+        if(x % 2 == 0) $hexRow.addClass("even");
 
         for(let y = 0; y < boardWidth; y++) {
             if(boardMatrix[x][y] == null) continue;
-            const hex = document.createElement("div");
-            hex.id = `${x}-${y}`;
-            hex.className = "hex";
-            hex.addEventListener("mousedown", _mouseClickEvent);
+            const $hex = $("<div></div>").attr("id", `${x}-${y}`);
+            $hex.addClass("hex");
+            $hex.mousedown((event) => { _mouseClickEvent(event) });
 
-            const hexTop = document.createElement("div");
-            hexTop.className = "top";
-            const hexMiddle = document.createElement("div");
-            hexMiddle.className = "middle";
-            const hexBottom = document.createElement("div");
-            hexBottom.className = "bottom";
+            const $hexTop = $("<div></div>").addClass("top");
+            const $hexMiddle = $("<div></div>").addClass("middle");
+            const $hexBottom = $("<div></div>").addClass("bottom");
 
-            hex.appendChild(hexTop);
-            hex.appendChild(hexMiddle);
-            hex.appendChild(hexBottom);
-            hexRow.appendChild(hex);
+            $hex.append($hexTop, $hexMiddle, $hexBottom);
+            $hexRow.append($hex);
+            $("#board").append($hexRow);
         }
-        container.appendChild(hexRow);
     }
 }
 
-export function generate({ boardWidth, boardHeight, mosquitos }) {
+export function generate({ boardWidth, boardHeight, bombs }) {
     boardMatrix = [];
     for(let x = 0; x < boardHeight; x++) {
         if(!boardMatrix[x]) boardMatrix[x] = []
@@ -57,50 +48,46 @@ export function generate({ boardWidth, boardHeight, mosquitos }) {
             }
         }
     }
-    _insertMosquitos(boardWidth, boardHeight, mosquitos);
+    _insertBombs(boardWidth, boardHeight, bombs);
     _updateNumbers(boardWidth, boardHeight);
 }
 
 export function selectTileByCord({x, y}) {
-    const tile = document.getElementById(`${x}-${y}`);
-    if (!tile) return;
-    _removeFlagNative(tile);
-    tile.classList.add("selected");
+    const $tile = $(`#${x}-${y}`);
+    _removeFlag($tile);
+    $tile.children().addClass("selected");
     boardMatrix[x][y].isSelected = true;
 
     if(boardMatrix[x][y].value !== 0) {
-        const middle = tile.querySelector(".middle");
-        if (middle) middle.textContent = boardMatrix[x][y].value;
+        $tile.find(".middle").text(boardMatrix[x][y].value);
     }
 }
 
 function _mouseClickEvent(event) {
     if(game.isGameOver) return;
-    if(isProcessingClick) return;
     if(timer.isRunning === false) timer.start();
-    if (event.button === 2) event.preventDefault();
 
     const $hexTile = $(event.currentTarget);
-    switch (event.button) {
-        case 0: // Left click
+    switch (event.which) {
+        case RIGHT_CLICK:
             _handleSelection($hexTile);
             break;
-        case 2: // Right click
+        case LEFT_CLICK:
             _toggleFlag($hexTile);
             break;
     }
 }
 
-function _insertMosquitos(boardWidth, boardHeight, mosquitos) {
-    mosquitoesArray = [];
-    for (let i = 0; i < mosquitos; i++) {
+function _insertBombs(boardWidth, boardHeight, bombs) {
+    mosquitoArray = [];
+    for (let i = 0; i < bombs; i++) {
         const x = Math.floor(Math.random() * boardHeight);
         const y = Math.floor(Math.random() * boardWidth);
 
-        if (boardMatrix[x][y] == null || boardMatrix[x][y].value == "🦟")  i--;
+        if (boardMatrix[x][y] == null || boardMatrix[x][y].value == "💣")  i--;
         else {
-            mosquitoesArray.push({ x, y });
-            boardMatrix[x][y].value = "🦟";
+            mosquitoArray.push({ x, y });
+            boardMatrix[x][y].value = "💣";
         }
     }
 }
@@ -108,7 +95,7 @@ function _insertMosquitos(boardWidth, boardHeight, mosquitos) {
 function _updateNumbers(boardWidth, boardHeight) {
     for (let x = 0; x < boardHeight; x++) {
         for (let y = 0; y < boardWidth; y++) {
-            if (boardMatrix[x][y]?.value == "🦟") {
+            if (boardMatrix[x][y]?.value == "💣") {
                 const modifier = x % 2 != 0 ? -1 : 0
                 _setNumber(x, y - 1);
                 _setNumber(x, y + 1);
@@ -125,7 +112,7 @@ function _setNumber(x, y) {
     if (
         x >= boardMatrix.length || y >= boardMatrix[0].length ||
         x < 0 || y < 0 ||
-        boardMatrix[x][y] == null || boardMatrix[x][y].value == "🦟"
+        boardMatrix[x][y] == null || boardMatrix[x][y].value == "💣"
     ) return;
     boardMatrix[x][y].value += 1;
 }
@@ -139,22 +126,20 @@ function _toggleFlag($hexTile) {
     if (hasFlag) {
         $hexTile.find(".middle").text("");
         $hexTile.children().removeClass("flagged");
-        game.setMosquitosLeft(game.mosquitosLeft+1);
+        game.setBombsLeft(game.bombsLeft+1);
     } else {
         $hexTile.find(".middle").text("🚩");
         $hexTile.children().addClass("flagged");
-        game.setMosquitosLeft(game.mosquitosLeft-1);
+        game.setBombsLeft(game.bombsLeft-1);
     }
 }
 
-function _removeFlagNative(hexTile) {
-    const middle = hexTile.querySelector(".middle");
-    if (!middle) return;
-    const hasFlag = middle.textContent === "🚩";
+function _removeFlag($hexTile) {
+    const hasFlag = $hexTile.find(".middle").text() == "🚩";
     if (hasFlag) {
-        middle.textContent = "";
-        hexTile.classList.remove("flagged");
-        game.setMosquitosLeft(game.mosquitosLeft + 1);
+        $hexTile.find(".middle").text("");
+        $hexTile.children().removeClass("flagged");
+        game.setBombsLeft(game.bombsLeft+1);
     }
 }
 
@@ -163,11 +148,8 @@ function _handleSelection($hexTile) {
     if (hasFlag) return;
 
     const { x, y } = _getHexTileCoord($hexTile.attr("id"));
-    const isMosquito = boardMatrix[x][y].value == '🦟';
-
-    isProcessingClick = true;
     boardMatrix[x][y].isSelected = true;
-    $hexTile.children().addClass("selected");
+    const isBomb = boardMatrix[x][y].value == '💣';
 
     if(!!boardMatrix[x][y].value) {
         $hexTile.find(".middle").text(boardMatrix[x][y].value);
@@ -175,15 +157,14 @@ function _handleSelection($hexTile) {
         _openZeroTiles({x, y});
     }
 
-    if (isMosquito) {
-        $hexTile.children().removeClass("selected");
-        $hexTile.children().addClass("mosquito");
-        _revealMosquitos();
+    if (isBomb) {
+        $hexTile.children().addClass("bomb");
+        _revealBombs();
         game.end("Voce perdeu!");
     } else {
+        $hexTile.children().addClass("selected");
         game.checkWin();
     }
-    isProcessingClick = false;
 }
 
 function _getHexTileCoord(id) {
@@ -193,11 +174,11 @@ function _getHexTileCoord(id) {
     return { x, y }
 }
 
-function _revealMosquitos() {
-    mosquitoesArray.forEach(({ x, y }) => {
+function _revealBombs() {
+    mosquitoArray.forEach(({ x, y }) => {
         const $hexTile = $(`#${x}-${y}`);
         $hexTile.find(".middle").text(boardMatrix[x][y]?.value);
-        $hexTile.children().addClass("mosquito");
+        $hexTile.children().addClass("bomb");
     })
 }
 
