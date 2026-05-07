@@ -169,11 +169,10 @@ function _handleSelection($hexTile) {
 
 function _getHexTileCoord(id) {
     const coordArray = id.split("-");
-    const x = coordArray[0];
-    const y = coordArray[1];
+    const x = Number(coordArray[0]); // está vindo como string, preciso converter para número para acessar a matriz corretamente
+    const y = Number(coordArray[1]); // está vindo como string, preciso converter para número para acessar a matriz corretamente
     return { x, y }
 }
-
 function _revealBombs() {
     mosquitoArray.forEach(({ x, y }) => {
         const $hexTile = $(`#${x}-${y}`);
