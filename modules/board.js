@@ -3,11 +3,10 @@ import * as timer from './timer.js';
 import * as graph from './graph.js';
 
 export let boardMatrix = [];
-let mosquitoArray = [];
-let isProcessingClick = false;
+let mosquitoesArray = [];
 
-const LEFT_CLICK = 1;
-const RIGHT_CLICK = 3;
+const RIGHT_CLICK = 1;
+const LEFT_CLICK = 3;
 
 export function draw({ boardWidth, boardHeight }) {
     const container = document.getElementById("board");
@@ -29,13 +28,12 @@ export function draw({ boardWidth, boardHeight }) {
 
             $hex.append($hexTop, $hexMiddle, $hexBottom);
             $hexRow.append($hex);
+            $("#board").append($hexRow);
         }
-
-        $("#board").append($hexRow); // ✅ fora do loop de y
     }
 }
 
-export function generate({ boardWidth, boardHeight, bombs }) {
+export function generate({ boardWidth, boardHeight, mosquitos }) {
     boardMatrix = [];
     for(let x = 0; x < boardHeight; x++) {
         if(!boardMatrix[x]) boardMatrix[x] = []
@@ -50,7 +48,7 @@ export function generate({ boardWidth, boardHeight, bombs }) {
             }
         }
     }
-    _insertBombs(boardWidth, boardHeight, bombs);
+    _insertMosquitos(boardWidth, boardHeight, mosquitos);
     _updateNumbers(boardWidth, boardHeight);
 }
 
@@ -67,31 +65,29 @@ export function selectTileByCord({x, y}) {
 
 function _mouseClickEvent(event) {
     if(game.isGameOver) return;
-    if(isProcessingClick) return;
     if(timer.isRunning === false) timer.start();
-    if(event.button === 2) event.preventDefault();
 
     const $hexTile = $(event.currentTarget);
-    switch (event.button) {
-        case LEFT_CLICK:
+    switch (event.which) {
+        case RIGHT_CLICK:
             _handleSelection($hexTile);
             break;
-        case RIGHT_CLICK:
+        case LEFT_CLICK:
             _toggleFlag($hexTile);
             break;
     }
 }
 
-function _insertBombs(boardWidth, boardHeight, bombs) {
-    mosquitoArray = [];
-    for (let i = 0; i < bombs; i++) {
+function _insertMosquitos(boardWidth, boardHeight, mosquitos) {
+    mosquitoesArray = [];
+    for (let i = 0; i < mosquitos; i++) {
         const x = Math.floor(Math.random() * boardHeight);
         const y = Math.floor(Math.random() * boardWidth);
 
         if (boardMatrix[x][y] == null || boardMatrix[x][y].value == "🦟")  i--;
         else {
-            mosquitoArray.push({ x, y });
-            boardMatrix[x][y].value = "🦟";
+            mosquitoesArray.push({ x, y });
+            boardMatrix[x][y].value = "💣";
         }
     }
 }
@@ -99,7 +95,7 @@ function _insertBombs(boardWidth, boardHeight, bombs) {
 function _updateNumbers(boardWidth, boardHeight) {
     for (let x = 0; x < boardHeight; x++) {
         for (let y = 0; y < boardWidth; y++) {
-            if (boardMatrix[x][y]?.value == "🦟") {
+            if (boardMatrix[x][y]?.value == "💣") {
                 const modifier = x % 2 != 0 ? -1 : 0
                 _setNumber(x, y - 1);
                 _setNumber(x, y + 1);
@@ -116,7 +112,7 @@ function _setNumber(x, y) {
     if (
         x >= boardMatrix.length || y >= boardMatrix[0].length ||
         x < 0 || y < 0 ||
-        boardMatrix[x][y] == null || boardMatrix[x][y].value == "🦟"
+        boardMatrix[x][y] == null || boardMatrix[x][y].value == "💣"
     ) return;
     boardMatrix[x][y].value += 1;
 }
@@ -130,11 +126,11 @@ function _toggleFlag($hexTile) {
     if (hasFlag) {
         $hexTile.find(".middle").text("");
         $hexTile.children().removeClass("flagged");
-        game.setBombsLeft(game.bombsLeft+1);
+        game.setMosquitosLeft(game.mosquitosLeft+1);
     } else {
         $hexTile.find(".middle").text("🚩");
         $hexTile.children().addClass("flagged");
-        game.setBombsLeft(game.bombsLeft-1);
+        game.setMosquitosLeft(game.mosquitosLeft-1);
     }
 }
 
@@ -143,7 +139,7 @@ function _removeFlag($hexTile) {
     if (hasFlag) {
         $hexTile.find(".middle").text("");
         $hexTile.children().removeClass("flagged");
-        game.setBombsLeft(game.bombsLeft+1);
+        game.setMosquitosLeft(game.mosquitosLeft+1);
     }
 }
 
@@ -152,11 +148,8 @@ function _handleSelection($hexTile) {
     if (hasFlag) return;
 
     const { x, y } = _getHexTileCoord($hexTile.attr("id"));
-    const isBomb = boardMatrix[x][y].value == '🦟';
-
-    isProcessingClick = true;
     boardMatrix[x][y].isSelected = true;
-    $hexTile.children().addClass("selected");
+    const isMosquito = boardMatrix[x][y].value == '🦟';
 
     if(!!boardMatrix[x][y].value) {
         $hexTile.find(".middle").text(boardMatrix[x][y].value);
@@ -164,43 +157,28 @@ function _handleSelection($hexTile) {
         _openZeroTiles({x, y});
     }
 
-    if (isBomb) {
-        $hexTile.children().removeClass("selected");
-        $hexTile.children().addClass("bomb");
-        _revealBombs();
+    if (isMosquito) {
+        $hexTile.children().addClass("mosquito");
+        _revealMosquitos();
         game.end("Voce perdeu!");
     } else {
+        $hexTile.children().addClass("selected");
         game.checkWin();
     }
-    isProcessingClick = false;
 }
 
 function _getHexTileCoord(id) {
     const coordArray = id.split("-");
-    
-    // Validar se o ID tem o formato correto
-    if(coordArray.length !== 2) {
-        console.error(`ID inválido: ${id}`);
-        return { x: -1, y: -1 };
-    }
-    
-    const x = Number(coordArray[0]);
-    const y = Number(coordArray[1]);
-    
-    // Validar se as coordenadas são números válidos
-    if(isNaN(x) || isNaN(y)) {
-        console.error(`Coordenadas inválidas: x=${x}, y=${y}`);
-        return { x: -1, y: -1 };
-    }
-    
-    return { x, y };
+    const x = coordArray[0];
+    const y = coordArray[1];
+    return { x, y }
 }
 
-function _revealBombs() {
-    mosquitoArray.forEach(({ x, y }) => {
+function _revealMosquitos() {
+    mosquitoesArray.forEach(({ x, y }) => {
         const $hexTile = $(`#${x}-${y}`);
         $hexTile.find(".middle").text(boardMatrix[x][y]?.value);
-        $hexTile.children().addClass("bomb");
+        $hexTile.children().addClass("mosquito");
     })
 }
 
