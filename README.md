@@ -23,4 +23,3 @@ Caso deseje usar http-server, basta utilizar o comando no diretório root do pro
 ## Outros
 Tabuleiro foi baseado pela página: http://jtauber.github.io/articles/css-hexagon.html
 
-O jogo foi baseado no jogo presente em: https://github.com/igorq937/Campo-Minado-Hexagonal
