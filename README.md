@@ -6,10 +6,7 @@
 ## Sobre
 O projeto consiste em uma variação do jogo campo minado no qual o tabuleiro é formado por hexágonos.
 
-## Screenshots
-![screenshot01](/screenshots/screenshot01.png)
-![screenshot02](/screenshots/screenshot02.png)
-![screenshot03](/screenshots/screenshot03.png)
+
 
 ## Instalação
 **Linguagem**: Javascript<br>
@@ -26,4 +23,3 @@ Caso deseje usar http-server, basta utilizar o comando no diretório root do pro
 ## Outros
 Tabuleiro foi baseado pela página: http://jtauber.github.io/articles/css-hexagon.html
 
-O jogo foi baseado no jogo presente em: https://github.com/igorq937/Campo-Minado-Hexagonal
