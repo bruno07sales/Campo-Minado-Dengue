@@ -67,4 +67,3 @@ export function dfs(matrix, { x, y }) {
     dfs(matrix, { x: x + 1, y: y + modifier });
     dfs(matrix, { x: x + 1, y: y + 1 + modifier });
 }
-
