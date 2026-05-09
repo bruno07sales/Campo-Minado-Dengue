@@ -12,7 +12,7 @@ const difficulties = [
 ];
 
 export function start() {
-    $('.title').text('Campo Contaminado');
+    $('.title').text('Campo ContaMinado');
     isGameOver = false;
     timer.clear();
 
@@ -66,4 +66,3 @@ function _loadDifficulty() {
 
     return difficulty;
 }
-
