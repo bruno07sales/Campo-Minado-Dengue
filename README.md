@@ -3,7 +3,7 @@
 **Conteúdo do Treinamento**: Grafos 1<br>
 
 ## Sobre
-O projeto consiste em uma variação do jogo Campo ContaMinado no qual o tabuleiro é formado por hexágonos.
+O projeto consiste em uma variação do jogo Campo Minado no qual o tabuleiro é formado por hexágonos.
 
 ## Instalação
 **Linguagem**: JavaScript<br>
