@@ -12,7 +12,7 @@ const difficulties = [
 ];
 
 export function start() {
-    $('.title').text('Campo Minado');
+    $('.title').text('Campo Contaminado');
     isGameOver = false;
     timer.clear();
 

@@ -29,8 +29,7 @@ function listenDifficulty() {
 
 function listenRestart() {
     $('#restart').click(() => {
-        const response = window.confirm('Todo seu progresso será perdido. Deseja reiniciar?');
-        if (response) game.start();
+       game.start();
     });
 }
 

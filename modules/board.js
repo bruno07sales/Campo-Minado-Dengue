@@ -199,7 +199,7 @@ function _handleSelection(hexTile) {
             el.classList.add('mosquito');
         });
         _revealMosquitos();
-        game.end('Você perdeu!');
+        game.end('Você foi contaminado!');
     } else {
         children.forEach((el) => el.classList.add('selected'));
         game.checkWin();
