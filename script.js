@@ -18,11 +18,8 @@ function listenDifficulty() {
         $option.click(() => {
             if ($option.hasClass('option-active')) return;
 
-            const response = window.confirm('Alterar a dificuldade reinicia o jogo. Deseja prosseguir?');
-            if (response) {
-                window.localStorage.setItem('difficulty', difficulty.id);
-                game.start();
-            }
+            window.localStorage.setItem('difficulty', difficulty.id);
+            game.start();
         });
     });
 }
@@ -46,4 +43,3 @@ function listenAlgorithm() {
         window.localStorage.setItem('algorithm', $(event.target)[0].id);
     });
 }
-
